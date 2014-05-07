@@ -17,42 +17,46 @@
 
 int main(int argc, char**argv)
 {
-	int sockfd, portno, n;
-	struct sockaddr_in serv_addr;
-	struct hostent *server;
+	int sockfd, webportno, proxyportno, n;
+	struct sockaddr_in serv_addr, proxy_addr;
+	struct hostent *proxy;
+	struct hostent *webserver;
+	
 
 	char buffer[256];
 
-	if (argc < 3) 
+	if (argc < 5) 
 	{
-		fprintf(stderr,"usage %s hostname port\n", argv[0]);
+		fprintf(stderr,"usage %s proxyHostName proxyport hostname port\n", argv[0]);
 		exit(0);
 	}
 
-	portno = atoi(argv[2]);
+	proxyportno = atoi(argv[2]);
+	webportno = atoi(argv[4]);
 
 	
 	/* Translate host name into peer's IP address ;
 	 * This is name translation service by the operating system 
 	 */
-	server = gethostbyname(argv[1]);
+	proxy = gethostbyname(argv[1]);
+	webserver = gethostbyname(argv[3]);
 	
-	if (server == NULL) 
+	if (proxy == NULL) 
 	{
 		fprintf(stderr,"ERROR, no such host\n");
 		exit(0);
 	}
 	
 	/* Building data structures for socket */
-	bzero((char *) &serv_addr, sizeof(serv_addr));
+	bzero((char *) &proxy_addr, sizeof(proxy_addr));
 
-	serv_addr.sin_family = AF_INET;
+	proxy_addr.sin_family = AF_INET;
 
-	bcopy((char *)server->h_addr, 
-			(char *)&serv_addr.sin_addr.s_addr,
-			server->h_length);
+	bcopy((char *)proxy->h_addr, 
+			(char *)&proxy_addr.sin_addr.s_addr,
+			proxy->h_length);
 
-	serv_addr.sin_port = htons(portno);
+	proxy_addr.sin_port = htons(proxyportno);
 
 	/* Create TCP socket -- active open 
 	* Preliminary steps: Setup: creation of active open socket
@@ -66,7 +70,7 @@ int main(int argc, char**argv)
 		exit(0);
 	}
 	
-	if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) 
+	if (connect(sockfd,(struct sockaddr *)&proxy_addr,sizeof(proxy_addr)) < 0) 
 	{
 		perror("ERROR connecting");
 		exit(0);
