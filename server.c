@@ -8,8 +8,6 @@
 -- Function declarations
 ---*/
 
-
-sdjhfg
 #define MAXUSERS 64
 
 /* returns a readable date as a string */
@@ -72,10 +70,6 @@ char * getReadableTime(){
 	char * realTime = asctime (timeinfo);
 	realTime[strlen(realTime)-1] = '\0';
 	return realTime;
-}
-
-int storeUserDetails(){
-
 }
 
 void luanchServer (struct Server s){
