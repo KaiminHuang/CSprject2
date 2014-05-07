@@ -1,20 +1,17 @@
 /* Hello World program */
 
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "connection.h"
+#include "logger.h"
 
 #define MAXUSERS 64
 
 /*---
 -- Function declarations
 ---*/
-
-/* returns a readable date as a string */
-char * getReadableTime();
 
 /* configures a new server on startup */
 struct Server config(char * port, int timeout);
@@ -56,25 +53,11 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-void logger(char* message){
-	printf("proxy-server [%s]: %s\n", getReadableTime(), message);
-}
-
 struct Server config(char * port, int timeout){
 	struct Server newServer;
 	newServer.port = port;
 	newServer.timeout = timeout;
 	return newServer;
-}
-
-char * getReadableTime(){
-	time_t rawtime;
-	struct tm * timeinfo;
-	time ( &rawtime );
-	timeinfo = localtime ( &rawtime );
-	char * realTime = asctime (timeinfo);
-	realTime[strlen(realTime)-1] = '\0';
-	return realTime;
 }
 
 void luanchServer (struct Server s){
