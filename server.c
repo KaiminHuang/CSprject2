@@ -8,6 +8,8 @@
 -- Function declarations
 ---*/
 
+#define MAXUSERS 64
+
 /* returns a readable date as a string */
 char * getReadableTime();
 
@@ -20,10 +22,23 @@ struct Server config(int port, int timeout);
 /* launches the server */
 void luanchServer (struct Server s);
 
+/* stores a single request */
+struct connectionDetails {
+	char * host;
+	int  * port;
+};
+
+/* individual client details (per connection) */
+struct Client {
+	struct connectionDetails clientDetails;
+	struct connectionDetails requestDetails;
+};
+
 /* new proxy server object */
 struct Server {
    int port;
    int timeout;
+   struct Client users[MAXUSERS];
 };
 
 int main(int argc, char *argv[])
@@ -66,7 +81,7 @@ void luanchServer (struct Server s){
 		// 3. request external host
 		// 4. get response and send it to client
 		// 5. log details
-		
+
 	}
 }
 
