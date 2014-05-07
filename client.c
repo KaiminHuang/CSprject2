@@ -17,12 +17,16 @@
 
 int main(int argc, char**argv)
 {
-	int sockfd, webportno, proxyportno, n;
+	int sockfd,proxyportno, n;
 	struct sockaddr_in serv_addr, proxy_addr;
 	struct hostent *proxy;
 	struct hostent *webserver;
-	
+	char *webportno;
 
+	// const char *webportno = *argv[4];
+	
+	// printf("%s\n", argv[4]);
+	// printf("%d\n", *webportno);
 	char buffer[256];
 
 	if (argc < 5) 
@@ -32,8 +36,7 @@ int main(int argc, char**argv)
 	}
 
 	proxyportno = atoi(argv[2]);
-	webportno = atoi(argv[4]);
-
+	webportno = argv[4];
 	
 	/* Translate host name into peer's IP address ;
 	 * This is name translation service by the operating system 
@@ -76,9 +79,12 @@ int main(int argc, char**argv)
 		exit(0);
 	}
 	// set up the request
+	// GET / HTTP/1.1\nHost: google.com:4000
 	buffer[0] = '\0';
 	strcat(buffer,"GET / HTTP/1.1\nHost: ");
-	strcat(buffer,argv[1]);
+	strcat(buffer,argv[3]);
+	strcat(buffer,":");
+	strcat(buffer, webportno);
 	strcat(buffer,"\r\n\r\n");
 	// send request
 	n = write(sockfd,buffer,strlen(buffer));
