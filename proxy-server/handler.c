@@ -16,33 +16,36 @@ void getWebServerName(char *buffer, char *WebServerName, char *WebServerPortNum)
 
 
 void handle(char* data){
-	char *WebServerName;
-	char *WebServerPortNum;
+	char WebServerName[50];
+	char WebServerPortNum[50];
 	getWebServerName(data, WebServerName, WebServerPortNum);
-	printf("WebServerName = %s \n", &WebServerName);
-	printf("WebServerPortNum = %s \n", &WebServerPortNum);
+	printf("WebServerName = %s \n", WebServerName);
+	printf("WebServerPortNum = %s \n", WebServerPortNum);
 }
 
 
 
-void getWebServerName(char *buffer, char *WebServerName, char *WebServerPortNum){
+void getWebServerName(char *buffer, char WebServerName[], char WebServerPortNum[]){
 	char* token;
 	int i = 0;
 	printf("buffer %s \n",buffer);
-	printf("=========== \n");
 	if (buffer != NULL) {
 		while ((token = strsep(&buffer, ";")) != NULL)
 		{
 			if(i == 1){
+				printf(" \n");
 				printf("token = %s \n", token);
-				WebServerName = token;
+				//WebServerName = malloc(strlen(token) + 1);
+				// WebServerName = token;
+				strcpy(WebServerName,token);
 			}else if(i == 2){
 				printf("token = %s \n", token);
-
-				WebServerPortNum = token;
+				//WebServerPortNum = malloc(strlen(token) + 1);
+				// WebServerPortNum = token;
+				strcpy(WebServerPortNum,token);
 			}
 
-			i++;
+			i=i+1;
 		}
 	}
 }
