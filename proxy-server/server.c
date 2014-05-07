@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "connection.h"
-#include "logger.h"
+
 
 #define MAXUSERS 64
 

@@ -1,5 +1,6 @@
 #ifndef HANDLER_H
-	
+
+void handle(char *data);
 	//functions to do:
 	// 1. take in data
 	// 2. parse it into object

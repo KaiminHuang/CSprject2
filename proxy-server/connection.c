@@ -46,7 +46,7 @@ void listenOnPort(char * port){
 		perror("ERROR on binding");
 		exit(1);
 	}
-	
+
 	/* Listen on socket - means we're ready to accept connections - 
 	 incoming connection requests will be queued */
 	listen(sockfd,5);
@@ -63,5 +63,7 @@ void listenOnPort(char * port){
 	/* Read characters from the connection,
 		then process */
 	n = read(newsockfd,buffer,255);
+	handle(buffer);
+
 	close(sockfd);
 }
