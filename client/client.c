@@ -97,14 +97,19 @@ int main(int argc, char**argv)
 	}
 	bzero(buffer,256);
 
+
+	printf("this is the return =====> \n");
+
 	//read the return file from server
 	n = read(sockfd,buffer,256);
 	// output the reuturn file
-	while(n > 0){
+	while(n ==256){
 		printf("%s",buffer);
 		bzero(buffer,256);
 		n = read(sockfd,buffer,256);
 	}
+	printf("%s",buffer);
+
 	if (n < 0)
 	{
 		perror("ERROR reading from socket");

@@ -64,10 +64,7 @@ void listenOnPort(char * port){
 	/* Read characters from the connection,
 		then process */
 	n = read(newsockfd,buffer,255);
-	printf("buffer is %s", buffer);
-
-	handle(buffer);
-
+	handle(buffer, newsockfd);
 	close(sockfd);
 }
 
@@ -78,7 +75,7 @@ int connectServer(char* serverName, char *webportno){
 	struct sockaddr_in serv_addr;
 	struct hostent *webserver;
 
-	char buffer[256];
+	
 
 	if ((serverName==NULL) || (webportno==NULL))
 	{
@@ -126,6 +123,13 @@ int connectServer(char* serverName, char *webportno){
 		perror("ERROR connecting");
 		exit(0);
 	}
+	return sockfd;
+
+}
+
+void sendRequest(char* serverName, char *webportno, int sockfd){
+	char buffer[256];
+	int n;
 	// set up the request
 	// GET / HTTP/1.1\nHost: google.com:4000
 	buffer[0] = '\0';
@@ -141,22 +145,31 @@ int connectServer(char* serverName, char *webportno){
 		perror("ERROR writing to socket");
 		exit(0);
 	}
-	bzero(buffer,256);
 
+}
+
+void getAndSendReturn(int clientSocket, int serverSocket){
+	char buffer[256];
+	int cn, sn;
+	bzero(buffer,256);
 	//read the return file from server
-	n = read(sockfd,buffer,256);
+	sn = read(serverSocket,buffer,256);
 	// output the reuturn file
-	while(n ==256){
-		printf("%s",buffer);
+	while(sn ==256){
+		cn = write(clientSocket,buffer,strlen(buffer));
 		bzero(buffer,256);
-		n = read(sockfd,buffer,256);
+		sn = read(serverSocket,buffer,256);
 	}
-	printf("%s",buffer);
-	if (n < 0)
+	if (sn < 0)
 	{
-		perror("ERROR reading from socket");
+		perror("ERROR reading from server socket");
 		exit(0);
 	}
-	printf("this is the end of connection <<======");
-	return 0;
+	cn = write(clientSocket,buffer,strlen(buffer));	
+	
+	if (cn < 0) 
+	{
+		perror("ERROR writing to client socket");
+		exit(0);
+	}
 }

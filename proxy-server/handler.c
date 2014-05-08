@@ -16,14 +16,14 @@
 void getWebServerName(char *buffer, char *WebServerName, char *WebServerPortNum);
 
 
-void handle(char* data){
+void handle(char* buffer, int clientSockfd){
+	int n, serverSockfd;
 	char WebServerName[50];
 	char WebServerPortNum[50];
-	getWebServerName(data, WebServerName, WebServerPortNum);
-	printf("WebServerName = %s \n", WebServerName);
-	printf("WebServerPortNum = %s \n", WebServerPortNum);
-	//try to connect server
-	connectServer(WebServerName, WebServerPortNum);
+	getWebServerName(buffer, WebServerName, WebServerPortNum);
+	serverSockfd = connectServer(WebServerName, WebServerPortNum);
+	sendRequest(WebServerName, WebServerPortNum, serverSockfd);
+	getAndSendReturn(clientSockfd, serverSockfd);
 }
 
 
