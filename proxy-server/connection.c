@@ -5,6 +5,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h> 
 
 #include "handler.h"
 /* close a socket */
@@ -36,12 +37,12 @@ void listenOnPort(char * port){
 	/* Create address we're going to listen on (given port number)
 	 - converted to network byte order & any IP address for 
 	 this machine */
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	 serv_addr.sin_family = AF_INET;
+	 serv_addr.sin_addr.s_addr = INADDR_ANY;
 	serv_addr.sin_port = htons(portno);  // store in machine-neutral format
 	/* Bind address to the socket */
 	if (bind(sockfd, (struct sockaddr *) &serv_addr,
-			sizeof(serv_addr)) < 0) 
+		sizeof(serv_addr)) < 0) 
 	{
 		perror("ERROR on binding");
 		exit(1);
@@ -63,7 +64,99 @@ void listenOnPort(char * port){
 	/* Read characters from the connection,
 		then process */
 	n = read(newsockfd,buffer,255);
+	printf("buffer is %s", buffer);
+
 	handle(buffer);
 
 	close(sockfd);
+}
+
+/* connectServer take portNum, serv_addr as parameters, and setting up connectin with web server 
+than sending the buffer to web server*/
+int connectServer(char* serverName, char *webportno){
+	int sockfd, n, webPortno;
+	struct sockaddr_in serv_addr;
+	struct hostent *webserver;
+
+	char buffer[256];
+
+	if ((serverName==NULL) || (webportno==NULL))
+	{
+		printf("empty serverName and port number\n");
+		exit(0);
+	}
+	
+	webPortno = atoi(webportno);
+	/* Translate host name into peer's IP address ;
+	 * This is name translation service by the operating system 
+	 */
+	 webserver = gethostbyname(serverName);
+
+	 if (webserver == NULL) 
+	 {
+	 	fprintf(stderr,"ERROR, no such host\n");
+	 	exit(0);
+	 }
+
+	/* Building data structures for socket */
+	 bzero((char *) &serv_addr, sizeof(serv_addr));
+
+	 serv_addr.sin_family = AF_INET;
+
+	 bcopy((char *)webserver->h_addr, 
+	 	(char *)&serv_addr.sin_addr.s_addr,
+	 	webserver->h_length);
+
+	 serv_addr.sin_port = htons(webPortno);
+
+	/* Create TCP socket -- active open 
+	* Preliminary steps: Setup: creation of active open socket
+	*/
+	
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	
+	if (sockfd < 0) 
+	{
+		perror("ERROR opening socket");
+		exit(0);
+	}
+	
+	if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) 
+	{
+		perror("ERROR connecting");
+		exit(0);
+	}
+	// set up the request
+	// GET / HTTP/1.1\nHost: google.com:4000
+	buffer[0] = '\0';
+	strcat(buffer,"GET / HTTP/1.1\nHost: ");
+	strcat(buffer,serverName);
+	strcat(buffer,"\r\n\r\n");
+
+	// send request
+	n = write(sockfd,buffer,strlen(buffer));
+
+	if (n < 0) 
+	{
+		perror("ERROR writing to socket");
+		exit(0);
+	}
+	bzero(buffer,256);
+
+	//read the return file from server
+	n = read(sockfd,buffer,256);
+	// output the reuturn file
+	while(n ==256){
+		printf("%s",buffer);
+		bzero(buffer,256);
+		n = read(sockfd,buffer,256);
+	}
+	printf("%s",buffer);
+	if (n < 0)
+	{
+		perror("ERROR reading from socket");
+		exit(0);
+	}
+	printf("this is the end of connection <<======");
+	return 0;
 }

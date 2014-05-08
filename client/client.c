@@ -84,7 +84,6 @@ int main(int argc, char**argv)
 	strcat(buffer,"GET / HTTP/1.1\nHost: ");
 	strcat(buffer,";");
 	strcat(buffer,argv[3]);
-	strcat(buffer,":");
 	strcat(buffer,";");
 	strcat(buffer, webportno);
 	strcat(buffer,"\r\n\r\n");

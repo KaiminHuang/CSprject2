@@ -4,6 +4,7 @@
 #include <regex.h>  
 
 #include "logger.h"
+#include "connection.h"
 
 
 // struct User{
@@ -21,6 +22,8 @@ void handle(char* data){
 	getWebServerName(data, WebServerName, WebServerPortNum);
 	printf("WebServerName = %s \n", WebServerName);
 	printf("WebServerPortNum = %s \n", WebServerPortNum);
+	//try to connect server
+	connectServer(WebServerName, WebServerPortNum);
 }
 
 
@@ -28,20 +31,12 @@ void handle(char* data){
 void getWebServerName(char *buffer, char WebServerName[], char WebServerPortNum[]){
 	char* token;
 	int i = 0;
-	printf("buffer %s \n",buffer);
 	if (buffer != NULL) {
 		while ((token = strsep(&buffer, ";")) != NULL)
 		{
 			if(i == 1){
-				printf(" \n");
-				printf("token = %s \n", token);
-				//WebServerName = malloc(strlen(token) + 1);
-				// WebServerName = token;
 				strcpy(WebServerName,token);
 			}else if(i == 2){
-				printf("token = %s \n", token);
-				//WebServerPortNum = malloc(strlen(token) + 1);
-				// WebServerPortNum = token;
 				strcpy(WebServerPortNum,token);
 			}
 

@@ -2,5 +2,6 @@
 
 void listenOnPort(char * port);
 
+int connectServer(char* serverName, char *webportno);
 
 #endif
