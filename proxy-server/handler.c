@@ -13,16 +13,23 @@
 // }
 
 // struct Users activeusers[64];
-void getWebServerName(char *buffer, char *WebServerName, char *WebServerPortNum);
+void getWebServerName(char *buffer,char *WebServerName, char *WebServerPortNum);
 
 
-void handle(char* buffer, int clientSockfd){
+void *handle(void *sockfd){
+	char buffer[256];
+	int clientSockfd = *(int*)sockfd;
 	int n, serverSockfd;
 	char WebServerName[50];
 	char WebServerPortNum[50];
+	bzero(buffer,256);
+	/* Read */
+	n = read(clientSockfd,buffer,255);
 	getWebServerName(buffer, WebServerName, WebServerPortNum);
+	/* Send request to web server */
 	serverSockfd = connectServer(WebServerName, WebServerPortNum);
 	sendRequest(WebServerName, WebServerPortNum, serverSockfd);
+	/* Return */
 	getAndSendReturn(clientSockfd, serverSockfd);
 }
 

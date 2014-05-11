@@ -1,6 +1,6 @@
 #ifndef HANDLER_H
 
-void handle(char* buffer, int clientSockfd);
+void *handle(void *clientSockfd);
 	//functions to do:
 	// 1. take in data
 	// 2. parse it into object
