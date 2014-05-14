@@ -9,6 +9,7 @@
 #include <pthread.h>
 
 #include "handler.h"
+#include "logger.h"
 /* close a socket */
 void close(int sockfd);
 
@@ -16,12 +17,12 @@ void close(int sockfd);
 int read(int newsockfd,char* buffer,int size);
 
 
+
 /* TODO: Function should continue to listen even when process has finished with a client */
 
 void listenOnPort(char * port){
 	int sockfd, newsockfd, portno;
-	uint clilen;
-	
+	uint client;
 	struct sockaddr_in serv_addr, cli_addr;
 	int n;
 
@@ -50,23 +51,28 @@ void listenOnPort(char * port){
 
     /* Listen */
 	listen(sockfd,5);
-	clilen = sizeof(cli_addr);
+	client = sizeof(cli_addr);
 	/* Accept a connection by add a new thread. */
 	while(1){
-		newsockfd = accept(	sockfd, (struct sockaddr *) &cli_addr, &clilen);
+		newsockfd = accept(	sockfd, (struct sockaddr *) &cli_addr, &client);
+		logRequest(sockfd);
+
 		if (newsockfd < 0) 
 		{
 			perror("ERROR on accept");
 			exit(1);
 		}else{
+
+
 			pthread_t thread;
 			if (pthread_create(&thread, NULL, handle, &newsockfd) != 0) {
-                fprintf(stderr, "Failed to create thread\n");
-            }
+				fprintf(stderr, "Failed to create thread\n");
+			}
 		}
 
 	}
 	close(sockfd);
+
 }
 
 /* connectServer take portNum, serv_addr as parameters, and setting up connectin with web server 

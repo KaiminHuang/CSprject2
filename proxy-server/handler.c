@@ -2,9 +2,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <regex.h>  
+#include <string.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
 
 #include "logger.h"
 #include "connection.h"
+
 
 
 // struct User{
@@ -23,6 +29,12 @@ void *handle(void *sockfd){
 	char WebServerName[50];
 	char WebServerPortNum[50];
 	bzero(buffer,256);
+	uint clilen;
+
+	struct sockaddr_in cli_addr;
+	clilen = sizeof(cli_addr);
+
+
 	/* Read */
 	n = read(clientSockfd,buffer,255);
 	getWebServerName(buffer, WebServerName, WebServerPortNum);
