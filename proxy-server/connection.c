@@ -133,6 +133,8 @@ void sendRequest(char* serverName, char *webportno, int sockfd){
 	int n;
 	// set up the request
 	// GET / HTTP/1.1\nHost: google.com:4000
+
+	// TODO - need to make it so the server can handle multiple types as a response
 	buffer[0] = '\0';
 	strcat(buffer,"GET / HTTP/1.1\nHost: ");
 	strcat(buffer,serverName);

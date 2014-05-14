@@ -16,7 +16,7 @@
 void getWebServerName(char *buffer,char *WebServerName, char *WebServerPortNum);
 
 
-void *handle(void *sockfd){
+void handle(void *sockfd){
 	char buffer[256];
 	int clientSockfd = *(int*)sockfd;
 	int n, serverSockfd;
