@@ -15,6 +15,10 @@
 #include <netdb.h> 
 
 
+int write(int sockfd,char *buffer, int length);
+
+int read(int sockfd,char *buffer, int length);
+
 int main(int argc, char**argv)
 {
 	int sockfd,proxyportno, n;
