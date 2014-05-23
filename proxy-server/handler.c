@@ -12,14 +12,6 @@
 #include "logger.h"
 #include "connection.h"
 
-
-
-// struct User{
-// 	ip
-// 	...
-// }
-
-// struct Users activeusers[64];
 void getWebServerName(char *buffer,char *WebServerName, char *WebServerPortNum);
 
 
@@ -41,17 +33,29 @@ void handle(void *sockfd){
 	getWebServerName(buffer, WebServerName, WebServerPortNum);
 	/* Send request to web server */
 	serverSockfd = connectServer(WebServerName, WebServerPortNum);
+
+	if (serverSockfd < 0){
+		//send error message to client
+		char buffer[256];
+		bzero(buffer,256);
+		int cn;
+		strcat(buffer,"No such host\r\n\r\n");
+		cn = write(clientSockfd,buffer,strlen(buffer));
+		pthread_exit(0);
+	}
+
 	sendRequest(WebServerName, WebServerPortNum, serverSockfd);
 	/* Return */
 	getAndSendReturn(clientSockfd, serverSockfd);
+	pthread_exit(0);
 }
 
 
 
 void getWebServerName(char *buffer, char WebServerName[], char WebServerPortNum[]){
-	/* get hostname from GET request */
 	regex_t regex;
 	int reti;
+	//set up the regualr expression
 	reti = regcomp(&regex, "GET http://(.*)/ HTTP/1.0", 
 		REG_ICASE | REG_EXTENDED);
 
@@ -62,13 +66,10 @@ void getWebServerName(char *buffer, char WebServerName[], char WebServerPortNum[
 	reti = regexec(&regex, p, n_matches, m, 0);
 	if (reti == 0)
 	{
-		/* match found, get hostname from the request, it is test version 2 */
 		int start = m[1].rm_so + (p - buffer);
 		int finish = m[1].rm_eo + (p - buffer);
-
 		strncpy(WebServerName,p + m[1].rm_so,finish - start);
 	} else {
-		/* no match, it is test version 1 */
 		WebServerName = buffer;
 	}
 

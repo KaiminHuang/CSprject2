@@ -62,8 +62,6 @@ void listenOnPort(char * port){
 			perror("ERROR on accept");
 			exit(1);
 		}else{
-
-
 			pthread_t thread;
 			if (pthread_create(&thread, NULL, handle, &newsockfd) != 0) {
 				fprintf(stderr, "Failed to create thread\n");
@@ -81,10 +79,8 @@ int connectServer(char* serverName, char *webportno){
 	int sockfd, n, webPortno;
 	struct sockaddr_in serv_addr;
 	struct hostent *webserver;
-
 	webportno = "80";
-	printf("serverName1: %s\n", serverName);
-	printf("webportno1: %s\n", webportno);
+
 
 	if ((serverName==NULL) || (webportno==NULL))
 	{
@@ -101,7 +97,7 @@ int connectServer(char* serverName, char *webportno){
 	 if (webserver == NULL) 
 	 {
 	 	fprintf(stderr,"ERROR, no such host\n");
-	 	exit(0);
+	 	return -1;
 	 }
 
 	/* Building data structures for socket */
@@ -124,13 +120,13 @@ int connectServer(char* serverName, char *webportno){
 	if (sockfd < 0) 
 	{
 		perror("ERROR opening socket");
-		exit(0);
+		return(-1);
 	}
 	
 	if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) 
 	{
 		perror("ERROR connecting");
-		exit(0);
+		return(-1);
 	}
 	return sockfd;
 

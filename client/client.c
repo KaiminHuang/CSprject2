@@ -33,14 +33,14 @@ int main(int argc, char**argv)
 	// printf("%d\n", *webportno);
 	char buffer[256];
 
-	if (argc < 5) 
+	if (argc < 4) 
 	{
-		fprintf(stderr,"usage %s proxyHostName proxyport hostname port\n", argv[0]);
+		fprintf(stderr,"usage %s proxyHostName proxyport hostname\n", argv[0]);
 		exit(0);
 	}
 
 	proxyportno = atoi(argv[2]);
-	webportno = argv[4];
+	webportno = "80";
 	
 	/* Translate host name into peer's IP address ;
 	 * This is name translation service by the operating system 
@@ -109,13 +109,10 @@ int main(int argc, char**argv)
 		n = read(sockfd,buffer,256);
 		printf("%s",buffer);
 	}
-
 	if (n < 0)
 	{
 		perror("ERROR reading from socket");
 		exit(0);
 	}
-
-
 	return 0;
 }
