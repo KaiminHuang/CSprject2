@@ -164,17 +164,18 @@ void getAndSendReturn(int clientSocket, int serverSocket){
 	//read the return file from server
 	sn = read(serverSocket,buffer,256);
 	// output the reuturn file
-	while(sn ==256){
+	while(sn > 0){
 		cn = write(clientSocket,buffer,strlen(buffer));
 		bzero(buffer,256);
 		sn = read(serverSocket,buffer,256);
 	}
+	cn = write(clientSocket,buffer,strlen(buffer));	
 	if (sn < 0)
 	{
 		perror("ERROR reading from server socket");
 		exit(0);
 	}
-	cn = write(clientSocket,buffer,strlen(buffer));	
+	
 	
 	if (cn < 0) 
 	{

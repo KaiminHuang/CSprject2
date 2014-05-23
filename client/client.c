@@ -106,13 +106,13 @@ int main(int argc, char**argv)
 
 	//read the return file from server
 	n = read(sockfd,buffer,256);
+	printf("%s",buffer);
 	// output the reuturn file
-	while(n ==256){
-		printf("%s",buffer);
+	while(n >0 ){
 		bzero(buffer,256);
 		n = read(sockfd,buffer,256);
+		printf("%s",buffer);
 	}
-	printf("%s",buffer);
 
 	if (n < 0)
 	{
