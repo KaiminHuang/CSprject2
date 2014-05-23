@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+#include <regex.h>
 
 #include "logger.h"
 #include "connection.h"
@@ -48,18 +49,29 @@ void handle(void *sockfd){
 
 
 void getWebServerName(char *buffer, char WebServerName[], char WebServerPortNum[]){
-	char* token;
-	int i = 0;
-	if (buffer != NULL) {
-		while ((token = strsep(&buffer, ";")) != NULL)
-		{
-			if(i == 1){
-				strcpy(WebServerName,token);
-			}else if(i == 2){
-				strcpy(WebServerPortNum,token);
-			}
+	/* get hostname from GET request */
+	regex_t regex;
+	int reti;
+	reti = regcomp(&regex, "GET http://(.*)/ HTTP/1.0", 
+		REG_ICASE | REG_EXTENDED);
 
-			i=i+1;
-		}
+	const char * p = buffer;
+	const int n_matches = 2;
+	regmatch_t m[n_matches];
+	// execute regular expression
+	reti = regexec(&regex, p, n_matches, m, 0);
+	if (reti == 0)
+	{
+		/* match found, get hostname from the request, it is test version 2 */
+		int start = m[1].rm_so + (p - buffer);
+		int finish = m[1].rm_eo + (p - buffer);
+
+		strncpy(WebServerName,p + m[1].rm_so,finish - start);
+	} else {
+		/* no match, it is test version 1 */
+		WebServerName = buffer;
 	}
+
+	
+
 }

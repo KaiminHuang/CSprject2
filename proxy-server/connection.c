@@ -82,7 +82,9 @@ int connectServer(char* serverName, char *webportno){
 	struct sockaddr_in serv_addr;
 	struct hostent *webserver;
 
-	
+	webportno = "80";
+	printf("serverName1: %s\n", serverName);
+	printf("webportno1: %s\n", webportno);
 
 	if ((serverName==NULL) || (webportno==NULL))
 	{
@@ -137,10 +139,7 @@ int connectServer(char* serverName, char *webportno){
 void sendRequest(char* serverName, char *webportno, int sockfd){
 	char buffer[256];
 	int n;
-	// set up the request
-	// GET / HTTP/1.1\nHost: google.com:4000
-
-	// TODO - need to make it so the server can handle multiple types as a response
+	printf("WebServerName: %s\n", serverName);
 	buffer[0] = '\0';
 	strcat(buffer,"GET / HTTP/1.1\nHost: ");
 	strcat(buffer,serverName);
