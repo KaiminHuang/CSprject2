@@ -97,9 +97,6 @@ int main(int argc, char**argv)
 	}
 	bzero(buffer,256);
 
-
-	printf("this is the return =====> \n");
-
 	//read the return file from server
 	n = read(sockfd,buffer,256);
 	printf("%s",buffer);

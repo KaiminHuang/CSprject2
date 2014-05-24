@@ -6,7 +6,7 @@ PSRC = client.c
 POBJ = client.o
 
 sched: $(POBJ)
-	$(CC) $(CFLAGS) -o $(EXE) $(POBJ)
+	$(CC) $(CFLAGS) -o $(EXE) $(POBJ) -lsocket -lnsl
 
 clean:
 	/bin/rm $(POBJ)
