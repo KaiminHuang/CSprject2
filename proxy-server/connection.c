@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <pthread.h>
+//#include <unistd.h>
 
 #include "handler.h"
 #include "logger.h"
@@ -67,6 +68,7 @@ void listenOnPort(char * port){
 			if (pthread_create(&thread, NULL, handle, &newsockfd) != 0) {
 				fprintf(stderr, "Failed to create thread\n");
 			}
+			
 		}
 
 	}
@@ -140,11 +142,10 @@ void sendRequest(char* serverName, char *webportno, int sockfd){
 	buffer[0] = '\0';
 	strcat(buffer,"GET / HTTP/1.1\nHost: ");
 	strcat(buffer,serverName);
-	strcat(buffer,"\r\n\r\n");
+	strcat(buffer,"\nConnection: close\r\n\r\n");
 
 	// send request
 	n = write(sockfd,buffer,strlen(buffer));
-
 	if (n < 0) 
 	{
 		perror("ERROR writing to socket");
@@ -168,7 +169,7 @@ int getAndSendReturn(int clientSocket, int serverSocket){
 		bzero(buffer,256);
 		sn = read(serverSocket,buffer,256);
 	}
-	cn = write(clientSocket,buffer,strlen(buffer));	
+
 	if (sn < 0)
 	{
 		perror("ERROR reading from server socket");

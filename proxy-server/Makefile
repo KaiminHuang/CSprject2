@@ -6,7 +6,7 @@ PSRC = server.c connection.c handler.c logger.c
 POBJ = server.o connection.o handler.o logger.o
 
 sched: $(POBJ)
-	$(CC) $(CFLAGS) -o $(EXE) $(POBJ)
+	$(CC) $(CFLAGS) -o $(EXE) $(POBJ) -lsocket -lnsl -std=c99 -lpthread
 
 clean:
 	/bin/rm $(POBJ)

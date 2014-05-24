@@ -34,8 +34,10 @@ void handle(void *sockfd){
 	/* Send request to web server */
 	serverSockfd = connectServer(WebServerName, WebServerPortNum);
 
+	// The given host name cannot be found
+	// Send erroe message to the client side
 	if (serverSockfd < 0){
-		//send error message to client
+		
 		char buffer[256];
 		bzero(buffer,256);
 		int cn;
