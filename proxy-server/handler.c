@@ -48,7 +48,10 @@ void handle(void *sockfd){
 
 	sendRequest(WebServerName, WebServerPortNum, serverSockfd);
 	/* Return */
-	getAndSendReturn(clientSockfd, serverSockfd);
+	int size = getAndSendReturn(clientSockfd, serverSockfd);
+
+	logRequest(clientSockfd, size, WebServerName);
+
 	pthread_exit(0);
 }
 

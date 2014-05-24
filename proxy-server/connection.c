@@ -56,7 +56,8 @@ void listenOnPort(char * port){
 	/* Accept a connection by add a new thread. */
 	while(1){
 		newsockfd = accept(	sockfd, (struct sockaddr *) &cli_addr, &client);
-		logRequest(sockfd);
+
+		printf("found new connection:");
 
 		if (newsockfd < 0) 
 		{
@@ -153,14 +154,17 @@ void sendRequest(char* serverName, char *webportno, int sockfd){
 
 }
 
-void getAndSendReturn(int clientSocket, int serverSocket){
+int getAndSendReturn(int clientSocket, int serverSocket){
 	char buffer[256];
 	int cn, sn;
 	bzero(buffer,256);
+
 	//read the return file from server
 	sn = read(serverSocket,buffer,256);
+	int size = 0;
 	// output the reuturn file
 	while(sn > 0){
+		size += sn;
 		cn = write(clientSocket,buffer,strlen(buffer));
 		bzero(buffer,256);
 		sn = read(serverSocket,buffer,256);
@@ -172,10 +176,11 @@ void getAndSendReturn(int clientSocket, int serverSocket){
 		exit(0);
 	}
 	
-	
 	if (cn < 0) 
 	{
 		perror("ERROR writing to client socket");
 		exit(0);
 	}
+
+	return size;
 }

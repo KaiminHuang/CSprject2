@@ -11,7 +11,7 @@ struct stat st = {0};
 
 char * getReadableTime();
 
-void logRequest(int s){
+void logRequest(int s, int size, char * host){
 
 	char ipstr[INET6_ADDRSTRLEN];
 	uint client;
@@ -29,15 +29,15 @@ void logRequest(int s){
 	printf("Peer port      : %d\n", port);
 
 
-	// if (stat("./logs", &st) == -1) {
- //    	mkdir("./logs", 0700);
-	// }
+	if (stat("./logs", &st) == -1) {
+    	mkdir("./logs", 0700);
+	}
 
-	// FILE * fp;
-	// fp = fopen("./logs/proxy.log", "a");
+	FILE * fp;
+	fp = fopen("./logs/proxy.log", "a");
 	//TODO replace the old varables
-	//fprintf(fp, "%s,%s,%s,%d,%s\n", getReadableTime(), ipAddress, port, size, host);
-	// fclose(fp);
+	fprintf(fp, "%s,%s,%d,%d,%s\n", getReadableTime(), ipstr, port, size, host);
+	fclose(fp);
 }
 
 char * getReadableTime(){

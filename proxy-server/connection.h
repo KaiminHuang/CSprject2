@@ -9,6 +9,6 @@ int connectServer(char* serverName, char *webportno);
 void sendRequest(char* serverName, char *webportno, int sockfd);
 
 //get return message from Web server and send them back to the client
-void getAndSendReturn(int clientSocket, int serverSocket);
+int getAndSendReturn(int clientSocket, int serverSocket);
 
 #endif
