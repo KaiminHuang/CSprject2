@@ -13,8 +13,6 @@
 /* close a socket */
 void close(int sockfd);
 
-#define BUFFERSIZE 256
-
 /* read a socket */
 int read(int newsockfd,char* buffer,int size);
 
@@ -63,8 +61,6 @@ void listenOnPort(char * port){
 			perror("ERROR on accept");
 			exit(1);
 		}else{
-
-
 			pthread_t thread;
 			if (pthread_create(&thread, NULL, handle, &newsockfd) != 0) {
 				fprintf(stderr, "Failed to create thread\n");
@@ -82,8 +78,8 @@ int connectServer(char* serverName, char *webportno){
 	int sockfd, n, webPortno;
 	struct sockaddr_in serv_addr;
 	struct hostent *webserver;
+	webportno = "80";
 
-	
 
 	if ((serverName==NULL) || (webportno==NULL))
 	{
@@ -100,7 +96,7 @@ int connectServer(char* serverName, char *webportno){
 	 if (webserver == NULL) 
 	 {
 	 	fprintf(stderr,"ERROR, no such host\n");
-	 	exit(0);
+	 	return -1;
 	 }
 
 	/* Building data structures for socket */
@@ -123,25 +119,22 @@ int connectServer(char* serverName, char *webportno){
 	if (sockfd < 0) 
 	{
 		perror("ERROR opening socket");
-		exit(0);
+		return(-1);
 	}
 	
 	if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) 
 	{
 		perror("ERROR connecting");
-		exit(0);
+		return(-1);
 	}
 	return sockfd;
 
 }
 
 void sendRequest(char* serverName, char *webportno, int sockfd){
-	char buffer[BUFFERSIZE];
+	char buffer[256];
 	int n;
-	// set up the request
-	// GET / HTTP/1.1\nHost: google.com:4000
-
-	// TODO - need to make it so the server can handle multiple types as a response
+	printf("WebServerName: %s\n", serverName);
 	buffer[0] = '\0';
 	strcat(buffer,"GET / HTTP/1.1\nHost: ");
 	strcat(buffer,serverName);
@@ -158,35 +151,34 @@ void sendRequest(char* serverName, char *webportno, int sockfd){
 
 }
 
-void getAndSendReturn(int clientSocket, int serverSocket, char * origin){
-	char buffer[BUFFERSIZE];
+void getAndSendReturn(int clientSocket, int serverSocket){
+	char buffer[256];
 	int cn, sn;
-	bzero(buffer,BUFFERSIZE);
+	bzero(buffer,256);
 	int size = 0;
+
 	//read the return file from server
-	sn = read(serverSocket,buffer,BUFFERSIZE);
+	sn = read(serverSocket,buffer,256);
+
 	// output the reuturn file
-
-	
-
-	while(sn==BUFFERSIZE){
+	while(sn > 0){
 		cn = write(clientSocket,buffer,strlen(buffer));
+		bzero(buffer,256);
 		size += strlen(buffer);
-		bzero(buffer,BUFFERSIZE);
-		sn = read(serverSocket,buffer,BUFFERSIZE);
+		sn = read(serverSocket,buffer,256);
 	}
+	cn = write(clientSocket,buffer,strlen(buffer));	
 	if (sn < 0)
 	{
 		perror("ERROR reading from server socket");
 		exit(0);
 	}
-	cn = write(clientSocket,buffer,strlen(buffer));	
-
-	logRequest(clientSocket, size, origin);
-
+	
 	if (cn < 0) 
 	{
 		perror("ERROR writing to client socket");
 		exit(0);
 	}
+
+	return size;
 }
