@@ -11,12 +11,7 @@
 #include "logger.h"
 #include "connection.h"
 
-
-
-// struct User{
-// 	ip
-// 	...
-// }
+#define BUFFERSIZE 256
 
 // struct Users activeusers[64];
 void getWebServerName(char *buffer,char *WebServerName, char *WebServerPortNum);
@@ -36,13 +31,13 @@ void handle(void *sockfd){
 
 
 	/* Read */
-	n = read(clientSockfd,buffer,255);
+	n = read(clientSockfd,buffer,256);
 	getWebServerName(buffer, WebServerName, WebServerPortNum);
 	/* Send request to web server */
 	serverSockfd = connectServer(WebServerName, WebServerPortNum);
 	sendRequest(WebServerName, WebServerPortNum, serverSockfd);
 	/* Return */
-	getAndSendReturn(clientSockfd, serverSockfd);
+	getAndSendReturn(clientSockfd, serverSockfd, WebServerName);
 }
 
 

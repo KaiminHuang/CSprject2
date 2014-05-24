@@ -13,6 +13,8 @@
 /* close a socket */
 void close(int sockfd);
 
+#define BUFFERSIZE 256
+
 /* read a socket */
 int read(int newsockfd,char* buffer,int size);
 
@@ -55,7 +57,6 @@ void listenOnPort(char * port){
 	/* Accept a connection by add a new thread. */
 	while(1){
 		newsockfd = accept(	sockfd, (struct sockaddr *) &cli_addr, &client);
-		logRequest(sockfd);
 
 		if (newsockfd < 0) 
 		{
@@ -135,7 +136,7 @@ int connectServer(char* serverName, char *webportno){
 }
 
 void sendRequest(char* serverName, char *webportno, int sockfd){
-	char buffer[256];
+	char buffer[BUFFERSIZE];
 	int n;
 	// set up the request
 	// GET / HTTP/1.1\nHost: google.com:4000
@@ -157,17 +158,22 @@ void sendRequest(char* serverName, char *webportno, int sockfd){
 
 }
 
-void getAndSendReturn(int clientSocket, int serverSocket){
-	char buffer[256];
+void getAndSendReturn(int clientSocket, int serverSocket, char * origin){
+	char buffer[BUFFERSIZE];
 	int cn, sn;
-	bzero(buffer,256);
+	bzero(buffer,BUFFERSIZE);
+	int size = 0;
 	//read the return file from server
-	sn = read(serverSocket,buffer,256);
+	sn = read(serverSocket,buffer,BUFFERSIZE);
 	// output the reuturn file
-	while(sn ==256){
+
+	
+
+	while(sn==BUFFERSIZE){
 		cn = write(clientSocket,buffer,strlen(buffer));
-		bzero(buffer,256);
-		sn = read(serverSocket,buffer,256);
+		size += strlen(buffer);
+		bzero(buffer,BUFFERSIZE);
+		sn = read(serverSocket,buffer,BUFFERSIZE);
 	}
 	if (sn < 0)
 	{
@@ -175,7 +181,9 @@ void getAndSendReturn(int clientSocket, int serverSocket){
 		exit(0);
 	}
 	cn = write(clientSocket,buffer,strlen(buffer));	
-	
+
+	logRequest(clientSocket, size, origin);
+
 	if (cn < 0) 
 	{
 		perror("ERROR writing to client socket");
