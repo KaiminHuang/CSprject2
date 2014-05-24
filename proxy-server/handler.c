@@ -12,6 +12,8 @@
 #include "logger.h"
 #include "connection.h"
 
+void close(int sockfd);
+
 void getWebServerName(char *buffer,char *WebServerName, char *WebServerPortNum);
 
 
@@ -43,6 +45,7 @@ void handle(void *sockfd){
 		int cn;
 		strcat(buffer,"No such host\r\n\r\n");
 		cn = write(clientSockfd,buffer,strlen(buffer));
+		close(clientSockfd);
 		pthread_exit(0);
 	}
 
@@ -51,7 +54,7 @@ void handle(void *sockfd){
 	int size = getAndSendReturn(clientSockfd, serverSockfd);
 
 	logRequest(clientSockfd, size, WebServerName);
-
+	close(clientSockfd);
 	pthread_exit(0);
 }
 
