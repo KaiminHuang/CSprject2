@@ -98,16 +98,18 @@ int main(int argc, char**argv)
 	bzero(buffer,256);
 
 
-	printf("this is the return =====> \n");
 
 	//read the return file from server
 	n = read(sockfd,buffer,256);
-	printf("%s",buffer);
 	// output the reuturn file
-	while(n >0 ){
+	int count = 0;
+	printf("%s",buffer);
+	while(n==256 || n==1){
 		bzero(buffer,256);
 		n = read(sockfd,buffer,256);
 		printf("%s",buffer);
+		printf("%d\n", n);
+		count++;
 	}
 	if (n < 0)
 	{
