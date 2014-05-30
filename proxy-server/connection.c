@@ -1,3 +1,14 @@
+/* connection.c
+   avin chadee - kaimin huang
+
+   handles inbound an outbound server logic, contains only logic that creates 
+   threads, listeners and sockets. does not contain any business logic (AKA) 
+   telling the server to forward the request to a webserver and wait for a 
+   return
+*/
+
+
+
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
@@ -7,21 +18,23 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <pthread.h>
-//#include <unistd.h>
-
 #include "handler.h"
 #include "logger.h"
+
+
 /* close a socket */
 void close(int sockfd);
 
 /* read a socket */
 int read(int newsockfd,char* buffer,int size);
 
-
-
-/* TODO: Function should continue to listen even when process has finished with a client */
-
+/*	Establishes a instance of a HTTP GET server on the given port number
+	and sets up a listner to listen and fork incoming requests
+		
+		char * port : the port number as a string taken from argc
+*/
 void listenOnPort(char * port){
+	/* init basic variables */
 	int sockfd, newsockfd, portno;
 	uint client;
 	struct sockaddr_in serv_addr, cli_addr;
@@ -29,6 +42,8 @@ void listenOnPort(char * port){
 
 	/* Create TCP socket */
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	
+	/* Catch any errors after creation */
 	if (sockfd < 0) 
 	{
 		perror("ERROR opening socket");
@@ -53,17 +68,17 @@ void listenOnPort(char * port){
     /* Listen */
 	listen(sockfd,5);
 	client = sizeof(cli_addr);
-	/* Accept a connection by add a new thread. */
 	while(1){
 		newsockfd = accept(	sockfd, (struct sockaddr *) &cli_addr, &client);
-
-		printf("found new connection:");
-
+		/* handle errors on accepting the connection */
 		if (newsockfd < 0) 
 		{
 			perror("ERROR on accept");
+			/* TODO  - not sure if it should be exiting here */
 			exit(1);
 		}else{
+
+			/* fork off new processes every time a request is made */
 			pthread_t thread;
 			if (pthread_create(&thread, NULL, handle, &newsockfd) != 0) {
 				fprintf(stderr, "Failed to create thread\n");
@@ -76,18 +91,20 @@ void listenOnPort(char * port){
 
 }
 
-/* connectServer take portNum, serv_addr as parameters, and setting up connectin with web server 
-than sending the buffer to web server*/
+/* Establishes a connection with a given webhost name and port number
+	char * serverName : string of the server name e.g. google.com
+	char * webportno  : port number of the given web host, defualts to 80
+*/
 int connectServer(char* serverName, char *webportno){
 	int sockfd, n, webPortno;
 	struct sockaddr_in serv_addr;
 	struct hostent *webserver;
 	webportno = "80";
 
-
+	/* kill outbound request if the host doesn't exist */
 	if ((serverName==NULL) || (webportno==NULL))
 	{
-		printf("empty serverName and port number\n");
+		printf("empty serverName or port number\n");
 		exit(0);
 	}
 	
@@ -97,6 +114,7 @@ int connectServer(char* serverName, char *webportno){
 	 */
 	 webserver = gethostbyname(serverName);
 
+	/* kill outbound request if the ip doesn't exist */
 	 if (webserver == NULL) 
 	 {
 	 	fprintf(stderr,"ERROR, no such host\n");
@@ -120,6 +138,7 @@ int connectServer(char* serverName, char *webportno){
 	
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	
+	/* Error checking on the socket status */
 	if (sockfd < 0) 
 	{
 		perror("ERROR opening socket");
@@ -135,6 +154,11 @@ int connectServer(char* serverName, char *webportno){
 
 }
 
+/* 	creates default GET template and sends a request to that server
+		char * serverName : name of the server
+		char * webportno  : port number
+		int sockfd 		  : socket id, generated in connect server
+*/
 void sendRequest(char* serverName, char *webportno, int sockfd){
 	char buffer[256];
 	int n;
@@ -154,6 +178,10 @@ void sendRequest(char* serverName, char *webportno, int sockfd){
 
 }
 
+/* 	gets a request from the client and sends it to the handler to process
+		int clientSocket  : id of socket
+		int serverSocket  : id of server socket
+*/
 int getAndSendReturn(int clientSocket, int serverSocket){
 	char buffer[256];
 	int cn, sn;

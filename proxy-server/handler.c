@@ -1,3 +1,10 @@
+/* handler.c
+	avin chadee - kaimin huang
+	
+	handles business logic in the system. In this case, a proxy server. So it 
+	forwards and logs requests
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -16,7 +23,10 @@ void close(int sockfd);
 
 void getWebServerName(char *buffer,char *WebServerName, char *WebServerPortNum);
 
-
+/* 	handles requests sent by connection.c and tells connection.c to forward another 
+	request
+		void * sockfd  :  socket of the client 
+*/
 void handle(void *sockfd){
 	char buffer[256];
 	int clientSockfd = *(int*)sockfd;
@@ -45,6 +55,7 @@ void handle(void *sockfd){
 		int cn;
 		strcat(buffer,"No such host\r\n\r\n");
 		cn = write(clientSockfd,buffer,strlen(buffer));
+		logRequest(clientSockfd, 0, WebServerName);
 		close(clientSockfd);
 		pthread_exit(0);
 	}
@@ -58,7 +69,12 @@ void handle(void *sockfd){
 	pthread_exit(0);
 }
 
-
+/* strips out any expressions that are not allowed and only accepts
+	get requests
+	char * buffer : string to be sent
+	char [] webservername : name of server to be sent to
+	char [] webserverportnum : port number of server 
+*/
 
 void getWebServerName(char *buffer, char WebServerName[], char WebServerPortNum[]){
 	regex_t regex;

@@ -39,6 +39,7 @@ struct Server config(char * port){
 	return newServer;
 }
 
+/* luanchs the server */
 void luanchServer (struct Server s){
 	listenOnPort(s.port);
 }
