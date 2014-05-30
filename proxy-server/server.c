@@ -1,4 +1,8 @@
-/* Hello World program */
+/* server.c
+	avin chadee - kaimin huang
+	
+	executable point of origin
+*/
 
 #include <stdio.h>
 #include <string.h>
